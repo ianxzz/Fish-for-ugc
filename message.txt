@@ -1,0 +1,197 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/Revenant", true))()
+local Flags = Library.Flags
+Library.DefaultColor = Color3.fromRGB(0, 140, 255)
+
+local Window = Library:Window({
+   Text = "Fish to Get Ugc!"
+})
+
+Label = Window:Label({
+   Text = "Join Discord Server!",
+   Color = Color3.fromRGB(88, 101, 242)
+})
+
+Window:Button({
+   Text = "Start Fishing",
+   Callback = function()
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-275, 2, -79) --tp
+wait(0.2)
+game.Players.LocalPlayer.Backpack.FishRod.Parent = game.Players.LocalPlayer.Character -- equipa fish rod
+wait(0.2)
+local args = {
+	"Cast",
+	vector.create(-282.2081604003906, -8, -45.380489349365234)
+}
+game:GetService("Players").LocalPlayer.Character:WaitForChild("FishRod"):WaitForChild("FishingEvent"):FireServer(unpack(args)) -- começa a pescar
+
+       Library:Notification({
+           Text = "Fishing Started",
+           Duration = 5
+       })
+   end
+})
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SellRemote = ReplicatedStorage:WaitForChild("SellFishRequest")
+
+local player = Players.LocalPlayer
+local backpack = player:WaitForChild("Backpack")
+local running = false
+
+-- Função que vende o peixe
+local function sellFish(fishName, amount)
+    local args = {
+        {
+            name = fishName,
+            action = "doOne",
+            amount = amount or 1
+        }
+    }
+    
+    SellRemote:FireServer(unpack(args))
+end
+
+-- Vende todos os peixes atualmente na backpack
+local function processBackpack()
+    local fishCount = {}
+
+    for _, tool in ipairs(backpack:GetChildren()) do
+        if tool:IsA("Tool") and tool.Name ~= "FishRod" then
+            local itemId = tool:GetAttribute("ItemId")
+            if itemId then
+                fishCount[itemId] = (fishCount[itemId] or 0) + 1
+            end
+        end
+    end
+
+    for fishName, amount in pairs(fishCount) do
+        sellFish(fishName, amount)
+    end
+end
+
+-- Detector de peixes entrando na Backpack
+local function setupInstantSell()
+    backpack.ChildAdded:Connect(function(child)
+        if not running then return end
+        
+        if child:IsA("Tool") and child.Name ~= "FishRod" then
+            local itemId = child:GetAttribute("ItemId")
+            if itemId then
+                -- vende 1 imediatamente
+                sellFish(itemId, 1)
+            end
+        end
+    end)
+end
+
+local function mainLoop()
+    task.spawn(function()
+        while running do
+            processBackpack()
+            task.wait(0.3)
+        end
+    end)
+end
+
+Window:Toggle({
+    Text = "Auto Sell",
+    Callback = function(v)
+        running = v
+        print("Pablovitar:", v)
+
+        if running then
+            setupInstantSell()
+            mainLoop()
+        end
+    end
+})
+
+Window:Button({
+   Text = "Anti Fling",
+   Callback = function()
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local antifling
+
+if antifling then
+    antifling:Disconnect()
+end
+
+antifling = RunService.Stepped:Connect(function()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer and player.Character then
+            for _, v in pairs(player.Character:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
+       Library:Notification({
+           Text = "Anti Fling Activated",
+           Duration = 5
+       })
+   end
+})
+
+Window:Button({
+   Text = "Anti AFK",
+   Callback = function()
+local vu = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:connect(function()
+	vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+		wait(1)
+		vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+	end)
+
+       Library:Notification({
+           Text = "Anti AFK Activated",
+           Duration = 5
+       })
+   end
+})
+
+-- porra de credito rgbolas
+local hue = 0
+local rgbLabel = Window:Label({
+    Text = "YT: PabloScripts21",
+    Color = Color3.fromHSV(hue, 1, 1)
+})
+
+task.spawn(function()
+    while true do
+        hue = (hue + 0.01) % 1
+        rgbLabel:Set({
+            Color = Color3.fromHSV(hue, 1, 1)
+        })
+        task.wait(0.05)
+    end
+end)
+
+Window:Button({
+   Text = "Copy Youtube link",
+   Callback = function()
+      setclipboard("https://www.youtube.com/@PabloScripts21")
+       Library:Notification({
+           Text = "youtube link copied to clipboard",
+           Duration = 6
+       })
+   end
+})
+
+Window:Button({
+   Text = "Copy Discord link",
+   Callback = function()
+      setclipboard("https://discord.gg/Z6U5pWSJ5
+      
+      https://discord.gg/tbMDneSc5")
+       Library:Notification({
+           Text = "Discord link copied to clipboard",
+           Duration = 6
+       })
+   end
+})
